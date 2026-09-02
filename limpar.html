@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Limpar Dados & Verificar Status</title>
+    <style>
+        body {
+            background: #000;
+            color: #fff;
+            font-family: monospace;
+            padding: 40px;
+            text-align: center;
+        }
+        h1 { color: #4CAF50; }
+        .status { margin: 20px 0; font-size: 18px; }
+        .success { color: #4CAF50; }
+        .warning { color: #ff9800; }
+        button { 
+            padding: 10px 20px; 
+            background: #4CAF50; 
+            color: #fff; 
+            border: none; 
+            border-radius: 5px; 
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover { background: #45a049; }
+    </style>
+</head>
+<body>
+    <h1>🧹 Limpeza Total & Verificação</h1>
+    
+    <div class="status">
+        <p id="status1" class="warning">⏳ Limpando localStorage...</p>
+        <p id="status2" class="warning">⏳ Limpando sessionStorage...</p>
+        <p id="status3" class="warning">⏳ Limpando cookies...</p>
+        <p id="status4" class="warning">⏳ Verificando localStorage após limpeza...</p>
+    </div>
+    
+    <button onclick="irParaApp()">Abrir App Limpo</button>
+    
+    <script>
+        // Limpar tudo
+        try {
+            localStorage.clear();
+            document.getElementById('status1').innerHTML = '<span class="success">✅ localStorage limpo!</span>';
+        } catch(e) {
+            document.getElementById('status1').innerHTML = '<span class="warning">⚠️ Erro ao limpar localStorage</span>';
+        }
+        
+        try {
+            sessionStorage.clear();
+            document.getElementById('status2').innerHTML = '<span class="success">✅ sessionStorage limpo!</span>';
+        } catch(e) {
+            document.getElementById('status2').innerHTML = '<span class="warning">⚠️ Erro ao limpar sessionStorage</span>';
+        }
+        
+        try {
+            document.cookie.split(";").forEach(function(c) { 
+                document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
+            });
+            document.getElementById('status3').innerHTML = '<span class="success">✅ Cookies deletados!</span>';
+        } catch(e) {
+            document.getElementById('status3').innerHTML = '<span class="warning">⚠️ Erro ao deletar cookies</span>';
+        }
+        
+        // Verificar se limpou mesmo
+        setTimeout(() => {
+            const remainingItems = localStorage.length;
+            if (remainingItems === 0) {
+                document.getElementById('status4').innerHTML = '<span class="success">✅ localStorage vazio (0 items)</span>';
+            } else {
+                document.getElementById('status4').innerHTML = '<span class="warning">⚠️ localStorage ainda tem ' + remainingItems + ' items! Refresque a página e tente novamente.</span>';
+            }
+        }, 100);
+        
+        function irParaApp() {
+            window.location.href = 'http://127.0.0.1:5500';
+        }
+    </script>
+</body>
+</html>
