@@ -68,7 +68,7 @@ const FRAME_OPTIONS = [
     'moldura/moldura58.png',
     'moldura/moldura59.png',
     'moldura/moldura60.png',
-    'moldura/moldura61.png',
+    'moldura/moldura061.png',
     'moldura/moldura62.png',
     'moldura/moldura63.png',
     'moldura/moldura64.png',
