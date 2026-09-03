@@ -78,6 +78,18 @@ const FRAME_OPTIONS = [
     'moldura/moldura68.png',
     'moldura/moldura69.png',
     'moldura/moldura70.png',
+    'moldura/moldura71.png',
+    'moldura/moldura72.png',
+    'moldura/moldura73.png',
+    'moldura/moldura74.png',
+    'moldura/moldura75.png',
+    'moldura/moldura76.png',
+    'moldura/moldura77.png',
+    'moldura/moldura78.png',
+    'moldura/moldura79.png',
+    'moldura/moldura80.png',
+    'moldura/moldura81.png',
+    'moldura/moldura82.png',
     'moldura/molduradiscord.png'
 ];
 
