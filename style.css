@@ -427,7 +427,7 @@ body {
 .container {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 40px 20px 120px 180px;
+    padding: 40px 20px 120px;
     position: relative;
     z-index: 2;
     width: 100%;
