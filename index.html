@@ -194,22 +194,6 @@
     </div>
 
     <div class="container">
-        <aside class="store-sections" aria-label="Seções da loja">
-            <p class="store-sections-title">Explorar</p>
-            <button type="button" class="store-section-btn active" data-store-section="Jogos" onclick="selectStoreSection('Jogos')">
-                <span class="store-section-icon">◈</span>
-                <span>Jogos</span>
-            </button>
-            <button type="button" class="store-section-btn" data-store-section="Apps" onclick="selectStoreSection('Apps')">
-                <span class="store-section-icon">▦</span>
-                <span>Apps</span>
-            </button>
-            <button type="button" class="store-section-btn" data-store-section="AnubixEsclusives" onclick="selectStoreSection('AnubixEsclusives')">
-                <span class="store-section-icon">✦</span>
-                <span>AnubixEsclusives</span>
-            </button>
-        </aside>
-
         <!-- Header -->
         <header class="header">
             <div class="header-top">
@@ -573,18 +557,12 @@
                             <input type="text" id="adminGameDescription" placeholder="Descrição" class="admin-input">
                         </div>
                         <div class="admin-form-row">
-                            <select id="adminGameStoreSection" class="admin-input">
-                                <option value="Jogos">Jogos</option>
-                                <option value="Apps">Apps</option>
-                                <option value="AnubixEsclusives">AnubixEsclusives</option>
-                            </select>
                             <select id="adminGameCategory" class="admin-input">
                                 <option value="">Sem categoria</option>
                                 <option>Ação</option><option>Aventura</option><option>RPG</option>
                                 <option>FPS</option><option>Estratégia</option><option>Esportes</option>
                                 <option>Corrida</option><option>Luta</option><option>Terror</option>
                                 <option>Indie</option><option>Simulação</option><option>MMO</option>
-                                <option>Apps</option><option>AnubixEsclusives</option>
                             </select>
                         </div>
                         <button onclick="adminAddGlobalGame()" class="admin-btn-success">Adicionar Jogo na Loja</button>
