@@ -1134,14 +1134,51 @@ function deleteGame(id) {
     }
 }
 
-// Função para fazer download de um jogo
-function downloadGame(url) {
-    // Se for uma URL, abre em nova aba
-    if (url.startsWith('http://') || url.startsWith('https://')) {
-        window.open(url, '_blank');
-    } else {
+// Função para iniciar o download de um jogo
+function inlineJson(value) {
+    return JSON.stringify(String(value ?? '')).replace(/"/g, '&quot;');
+}
+
+function downloadGame(url, gameName = 'Jogo') {
+    if (!/^https?:\/\//i.test(url)) {
         alert('URL inválida!');
+        return;
     }
+
+    const tray = document.getElementById('downloadTray');
+    if (tray) {
+        tray.innerHTML = `
+            <div class="download-tray-icon">↓</div>
+            <div class="download-tray-info">
+                <strong>${gameName}</strong>
+                <span id="downloadTrayStatus">Iniciando download...</span>
+            </div>
+            <button type="button" class="download-tray-close" onclick="closeDownloadTray()" aria-label="Fechar download">&times;</button>
+        `;
+        tray.classList.add('show');
+        tray.setAttribute('aria-hidden', 'false');
+        window.setTimeout(() => {
+            const status = document.getElementById('downloadTrayStatus');
+            if (status) status.textContent = 'Download iniciado';
+        }, 500);
+    }
+
+    const downloadLink = document.createElement('a');
+    downloadLink.href = url;
+    downloadLink.target = '_blank';
+    downloadLink.rel = 'noopener noreferrer';
+    downloadLink.download = '';
+    downloadLink.style.display = 'none';
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    downloadLink.remove();
+}
+
+function closeDownloadTray() {
+    const tray = document.getElementById('downloadTray');
+    if (!tray) return;
+    tray.classList.remove('show');
+    tray.setAttribute('aria-hidden', 'true');
 }
 
 const GAME_CATEGORIES = ['Todos','Ação','Aventura','RPG','FPS','Estratégia','Esportes','Corrida','Luta','Terror','Indie','Simulação','MMO'];
@@ -1346,7 +1383,7 @@ function renderGames(games, searchQuery = '') {
                             <h3 class="game-name">${game.name}</h3>
                             <p class="game-description">${game.description || ''}</p>
                             <div class="game-actions">
-                                <button class="download-btn" onclick="downloadGame('${game.url}'); addToHistory('${game.name}')">Download</button>
+                                <button class="download-btn" onclick="downloadGame(${inlineJson(game.url)}, ${inlineJson(game.name)}); addToHistory(${inlineJson(game.name)})">Download</button>
                                 ${!game.isGlobal ? `<button class="delete-btn" onclick="deleteGame(${game.id})">Remover</button>` : ''}
                             </div>
                         </div>
@@ -2220,7 +2257,7 @@ function renderFavoriteGames(games, searchQuery = '') {
                             </div>
                             <p class="game-description">${game.description}</p>
                             <div class="game-actions">
-                                <button class="download-btn" onclick="downloadGame('${game.url}'); addToHistory('${game.name}')">
+                                <button class="download-btn" onclick="downloadGame(${inlineJson(game.url)}, ${inlineJson(game.name)}); addToHistory(${inlineJson(game.name)})">
                                     Download
                                 </button>
                                 <button class="delete-btn" onclick="deleteGame(${game.id})">
