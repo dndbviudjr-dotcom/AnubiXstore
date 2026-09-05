@@ -389,11 +389,9 @@ async function adminLoadGlobalGames() {
             ? '<p style="color: rgba(255,255,255,0.45);">Nenhum item global cadastrado.</p>'
             : snapshot.docs.map(doc => {
                 const game = doc.data();
-                const section = game.storeSection || (game.category === 'Apps' || game.category === 'AnubixEsclusives' ? game.category : 'Jogos');
                 return `<div class="admin-game-item">
                     <img src="${game.image || ''}" alt="${game.name || 'Item'}">
                     <div class="admin-game-item-name">${game.name || 'Sem nome'}</div>
-                    <div class="admin-game-item-name">${section}</div>
                     <button class="admin-game-item-delete" onclick="adminDeleteGlobalGame('${doc.id}')">Remover</button>
                 </div>`;
             }).join('');
@@ -408,7 +406,6 @@ async function adminAddGlobalGame() {
     const url = document.getElementById('adminGameUrl').value.trim();
     const image = document.getElementById('adminGameImage').value.trim();
     const description = document.getElementById('adminGameDescription').value.trim();
-    const storeSection = document.getElementById('adminGameStoreSection').value;
     const category = document.getElementById('adminGameCategory').value;
 
     if (!name || !url || !image) {
@@ -422,13 +419,11 @@ async function adminAddGlobalGame() {
             url,
             image,
             description,
-            storeSection,
             category,
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
         document.querySelector('.admin-game-form').querySelectorAll('input').forEach(input => input.value = '');
         document.getElementById('adminGameCategory').value = '';
-        document.getElementById('adminGameStoreSection').value = 'Jogos';
         await adminLoadGlobalGames();
         loadGames();
         alert('Item adicionado à loja.');
@@ -493,12 +488,10 @@ function loadGames() {
 
 function updateVideoBackgroundVisibility() {
     const videoBackground = document.querySelector('.video-background');
-    const storeSections = document.querySelector('.store-sections');
     if (!videoBackground) return;
 
     const shouldShow = currentView === 'all' || currentView === 'favorites' || currentView === 'profile' || currentView === 'friends';
     videoBackground.classList.toggle('hidden', !shouldShow);
-    if (storeSections) storeSections.classList.toggle('hidden', currentView !== 'all');
 }
 
 function showHome() {
@@ -1153,16 +1146,6 @@ function downloadGame(url) {
 
 const GAME_CATEGORIES = ['Todos','Ação','Aventura','RPG','FPS','Estratégia','Esportes','Corrida','Luta','Terror','Indie','Simulação','MMO'];
 let activeCategory = 'Todos';
-let activeStoreSection = 'Jogos';
-
-function selectStoreSection(section) {
-    activeStoreSection = section;
-    activeCategory = 'Todos';
-    document.querySelectorAll('.store-section-btn').forEach(button => {
-        button.classList.toggle('active', button.dataset.storeSection === section);
-    });
-    loadGames();
-}
 
 function renderCategoryBar() {
     return `<div class="category-bar" style="grid-column: 1 / -1;">${
@@ -1340,13 +1323,9 @@ function renderGames(games, searchQuery = '') {
     const gamesGrid = document.getElementById('gamesGrid');
     window.currentFavoritesMode = false;
 
-    const sectionGames = games.filter(game => {
-        const section = game.storeSection || (game.category === 'Apps' || game.category === 'AnubixEsclusives' ? game.category : 'Jogos');
-        return section === activeStoreSection;
-    });
     const filtered = activeCategory === 'Todos'
-        ? sectionGames
-        : sectionGames.filter(game => game.category === activeCategory);
+        ? games
+        : games.filter(game => game.category === activeCategory);
 
     gamesGrid.innerHTML = renderSearchBar() + (
         filtered.length === 0
