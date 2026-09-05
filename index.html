@@ -67,18 +67,6 @@
         <div class="video-overlay"></div>
     </div>
 
-    <!-- Sidebar -->
-    <aside class="sidebar" style="display: none;">
-        <div class="sidebar-content">
-            <div class="logo">AnubiXstore</div>
-            <nav class="sidebar-nav">
-                <a href="#" class="nav-item active">Jogos</a>
-                <a href="#" class="nav-item">Favoritos</a>
-                <a href="#" class="nav-item">Histórico</a>
-            </nav>
-        </div>
-    </aside>
-
     <!-- Bottom Navigation Bar -->
     <nav class="bottom-nav">
         <button class="nav-btn profile-btn" onclick="showProfile()" type="button">
@@ -206,6 +194,22 @@
     </div>
 
     <div class="container">
+        <aside class="store-sections" aria-label="Seções da loja">
+            <p class="store-sections-title">Explorar</p>
+            <button type="button" class="store-section-btn active" data-store-section="Jogos" onclick="selectStoreSection('Jogos')">
+                <span class="store-section-icon">◈</span>
+                <span>Jogos</span>
+            </button>
+            <button type="button" class="store-section-btn" data-store-section="Apps" onclick="selectStoreSection('Apps')">
+                <span class="store-section-icon">▦</span>
+                <span>Apps</span>
+            </button>
+            <button type="button" class="store-section-btn" data-store-section="AnubixEsclusives" onclick="selectStoreSection('AnubixEsclusives')">
+                <span class="store-section-icon">✦</span>
+                <span>AnubixEsclusives</span>
+            </button>
+        </aside>
+
         <!-- Header -->
         <header class="header">
             <div class="header-top">
@@ -575,6 +579,7 @@
                                 <option>FPS</option><option>Estratégia</option><option>Esportes</option>
                                 <option>Corrida</option><option>Luta</option><option>Terror</option>
                                 <option>Indie</option><option>Simulação</option><option>MMO</option>
+                                <option>Apps</option><option>AnubixEsclusives</option>
                             </select>
                         </div>
                         <button onclick="adminAddGlobalGame()" class="admin-btn-success">Adicionar Jogo na Loja</button>
