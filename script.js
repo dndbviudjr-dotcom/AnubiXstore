@@ -379,6 +379,77 @@ async function adminLoadStats() {
     } catch(e) { console.error(e); }
 }
 
+async function adminLoadGlobalGames() {
+    const list = document.getElementById('adminGlobalGamesList');
+    if (!list || typeof firebase === 'undefined' || !firebase.firestore) return;
+
+    try {
+        const snapshot = await firebase.firestore().collection('globalGames').get();
+        list.innerHTML = snapshot.empty
+            ? '<p style="color: rgba(255,255,255,0.45);">Nenhum item global cadastrado.</p>'
+            : snapshot.docs.map(doc => {
+                const game = doc.data();
+                const section = game.storeSection || (game.category === 'Apps' || game.category === 'AnubixEsclusives' ? game.category : 'Jogos');
+                return `<div class="admin-game-item">
+                    <img src="${game.image || ''}" alt="${game.name || 'Item'}">
+                    <div class="admin-game-item-name">${game.name || 'Sem nome'}</div>
+                    <div class="admin-game-item-name">${section}</div>
+                    <button class="admin-game-item-delete" onclick="adminDeleteGlobalGame('${doc.id}')">Remover</button>
+                </div>`;
+            }).join('');
+    } catch (error) {
+        console.error('Erro ao carregar itens globais:', error);
+        list.innerHTML = '<p style="color: #ff9a9a;">Não foi possível carregar os itens.</p>';
+    }
+}
+
+async function adminAddGlobalGame() {
+    const name = document.getElementById('adminGameName').value.trim();
+    const url = document.getElementById('adminGameUrl').value.trim();
+    const image = document.getElementById('adminGameImage').value.trim();
+    const description = document.getElementById('adminGameDescription').value.trim();
+    const storeSection = document.getElementById('adminGameStoreSection').value;
+    const category = document.getElementById('adminGameCategory').value;
+
+    if (!name || !url || !image) {
+        alert('Preencha nome, link e capa.');
+        return;
+    }
+
+    try {
+        await firebase.firestore().collection('globalGames').add({
+            name,
+            url,
+            image,
+            description,
+            storeSection,
+            category,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        document.querySelector('.admin-game-form').querySelectorAll('input').forEach(input => input.value = '');
+        document.getElementById('adminGameCategory').value = '';
+        document.getElementById('adminGameStoreSection').value = 'Jogos';
+        await adminLoadGlobalGames();
+        loadGames();
+        alert('Item adicionado à loja.');
+    } catch (error) {
+        console.error('Erro ao adicionar item global:', error);
+        alert('Não foi possível adicionar o item.');
+    }
+}
+
+async function adminDeleteGlobalGame(id) {
+    if (!confirm('Remover este item da loja?')) return;
+    try {
+        await firebase.firestore().collection('globalGames').doc(id).delete();
+        await adminLoadGlobalGames();
+        loadGames();
+    } catch (error) {
+        console.error('Erro ao remover item global:', error);
+        alert('Não foi possível remover o item.');
+    }
+}
+
 async function adminSetName() {
     if (!window.adminSelectedUser) { alert('Busque um usuário primeiro'); return; }
     const val = document.getElementById('adminNameInput').value.trim();
@@ -422,10 +493,12 @@ function loadGames() {
 
 function updateVideoBackgroundVisibility() {
     const videoBackground = document.querySelector('.video-background');
+    const storeSections = document.querySelector('.store-sections');
     if (!videoBackground) return;
 
     const shouldShow = currentView === 'all' || currentView === 'favorites' || currentView === 'profile' || currentView === 'friends';
     videoBackground.classList.toggle('hidden', !shouldShow);
+    if (storeSections) storeSections.classList.toggle('hidden', currentView !== 'all');
 }
 
 function showHome() {
@@ -1084,6 +1157,7 @@ let activeStoreSection = 'Jogos';
 
 function selectStoreSection(section) {
     activeStoreSection = section;
+    activeCategory = 'Todos';
     document.querySelectorAll('.store-section-btn').forEach(button => {
         button.classList.toggle('active', button.dataset.storeSection === section);
     });
@@ -1266,9 +1340,10 @@ function renderGames(games, searchQuery = '') {
     const gamesGrid = document.getElementById('gamesGrid');
     window.currentFavoritesMode = false;
 
-    const sectionGames = activeStoreSection === 'Jogos'
-        ? games
-        : games.filter(game => game.category === activeStoreSection);
+    const sectionGames = games.filter(game => {
+        const section = game.storeSection || (game.category === 'Apps' || game.category === 'AnubixEsclusives' ? game.category : 'Jogos');
+        return section === activeStoreSection;
+    });
     const filtered = activeCategory === 'Todos'
         ? sectionGames
         : sectionGames.filter(game => game.category === activeCategory);
