@@ -1134,13 +1134,41 @@ function deleteGame(id) {
     }
 }
 
+function getGoogleDriveFileId(value) {
+    const input = String(value || '').trim();
+    if (/^[a-zA-Z0-9_-]{20,}$/.test(input)) return input;
+
+    const patterns = [
+        /\/file\/d\/([a-zA-Z0-9_-]+)/,
+        /[?&]id=([a-zA-Z0-9_-]+)/,
+        /\/uc\?id=([a-zA-Z0-9_-]+)/
+    ];
+
+    for (const pattern of patterns) {
+        const match = input.match(pattern);
+        if (match) return match[1];
+    }
+
+    return '';
+}
+
+function normalizeDownloadUrl(value) {
+    const input = String(value || '').trim();
+    const driveFileId = getGoogleDriveFileId(input);
+    if (driveFileId) {
+        return `https://drive.usercontent.google.com/download?id=${encodeURIComponent(driveFileId)}&export=download`;
+    }
+    return input;
+}
+
 // Função para iniciar o download de um jogo
 function inlineJson(value) {
     return JSON.stringify(String(value ?? '')).replace(/"/g, '&quot;');
 }
 
 function downloadGame(url, gameName = 'Jogo') {
-    if (!/^https?:\/\//i.test(url)) {
+    const downloadUrl = normalizeDownloadUrl(url);
+    if (!/^https?:\/\//i.test(downloadUrl)) {
         alert('URL inválida!');
         return;
     }
@@ -1163,15 +1191,12 @@ function downloadGame(url, gameName = 'Jogo') {
         }, 500);
     }
 
-    const downloadLink = document.createElement('a');
-    downloadLink.href = url;
-    downloadLink.target = '_blank';
-    downloadLink.rel = 'noopener noreferrer';
-    downloadLink.download = '';
-    downloadLink.style.display = 'none';
-    document.body.appendChild(downloadLink);
-    downloadLink.click();
-    downloadLink.remove();
+    const downloadFrame = document.createElement('iframe');
+    downloadFrame.src = downloadUrl;
+    downloadFrame.title = `Download de ${gameName}`;
+    downloadFrame.style.display = 'none';
+    document.body.appendChild(downloadFrame);
+    window.setTimeout(() => downloadFrame.remove(), 60000);
 }
 
 function closeDownloadTray() {
