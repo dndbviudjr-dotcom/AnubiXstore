@@ -318,13 +318,6 @@ document.addEventListener('DOMContentLoaded', () => {
     currentView = 'all';
     updateVideoBackgroundVisibility();
 
-    // Não carrega perfil aqui - deixa Firebase fazer isso após autenticação
-    // const profile = getProfile();
-    // const frameSelect = document.getElementById('profileFrameSelect');
-    // if (frameSelect) {
-    //     frameSelect.value = profile.frame || '';
-    // }
-
     syncFrameInventorySelection();
 
     handleSpotifyAuthCallback();
@@ -1006,11 +999,6 @@ function showManagementScreen() {
     document.getElementById('managementGameForm').reset();
 }
 
-// Função para configurar listeners da sidebar
-function setupSidebarListeners() {
-    // Função mantida para compatibilidade mas não usada com bottom nav
-}
-
 // Função para adicionar/remover favoritos
 function toggleFavorite(gameId) {
     let favorites = getFavorites();
@@ -1057,12 +1045,6 @@ function addToHistory(gameName) {
     localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
 }
 
-// Função para adicionar novo jogo (legado - usar addGameFromManagement)
-function addGame(event) {
-    // Esta função mantida apenas por compatibilidade
-    // Usar addGameFromManagement ao invés
-}
-
 // Função para deletar um jogo
 function deleteGame(id) {
     if (confirm('Tem certeza que deseja deletar este jogo?')) {
@@ -1098,6 +1080,15 @@ function downloadGame(url) {
 
 const GAME_CATEGORIES = ['Todos','Ação','Aventura','RPG','FPS','Estratégia','Esportes','Corrida','Luta','Terror','Indie','Simulação','MMO'];
 let activeCategory = 'Todos';
+let activeStoreSection = 'Jogos';
+
+function selectStoreSection(section) {
+    activeStoreSection = section;
+    document.querySelectorAll('.store-section-btn').forEach(button => {
+        button.classList.toggle('active', button.dataset.storeSection === section);
+    });
+    loadGames();
+}
 
 function renderCategoryBar() {
     return `<div class="category-bar" style="grid-column: 1 / -1;">${
@@ -1275,7 +1266,12 @@ function renderGames(games, searchQuery = '') {
     const gamesGrid = document.getElementById('gamesGrid');
     window.currentFavoritesMode = false;
 
-    const filtered = activeCategory === 'Todos' ? games : games.filter(g => g.category === activeCategory);
+    const sectionGames = activeStoreSection === 'Jogos'
+        ? games
+        : games.filter(game => game.category === activeStoreSection);
+    const filtered = activeCategory === 'Todos'
+        ? sectionGames
+        : sectionGames.filter(game => game.category === activeCategory);
 
     gamesGrid.innerHTML = renderSearchBar() + (
         filtered.length === 0
